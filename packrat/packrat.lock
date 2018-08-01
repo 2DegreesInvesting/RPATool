@@ -1,0 +1,211 @@
+PackratFormat: 1.4
+PackratVersion: 0.4.9.1
+RVersion: 3.4.4
+Repos: CRAN=https://cran.rstudio.com/
+
+Package: R6
+Source: CRAN
+Version: 2.2.2
+Hash: b2366cd9d2f3851a5704b4e192b985c2
+
+Package: RColorBrewer
+Source: CRAN
+Version: 1.1-2
+Hash: c0d56cd15034f395874c870141870c25
+
+Package: Rcpp
+Source: CRAN
+Version: 0.12.16
+Hash: 8cc9dc88c11acdcf8a6dec4a0f1500bc
+
+Package: assertthat
+Source: CRAN
+Version: 0.2.0
+Hash: e8805df54c65ac96d50235c44a82615c
+
+Package: cli
+Source: CRAN
+Version: 1.0.0
+Hash: f4239f89feb7ddc65821e4514e9734ae
+Requires: assertthat, crayon
+
+Package: colorspace
+Source: CRAN
+Version: 1.3-2
+Hash: 0bf8618b585fa98eb23414cd3ab95118
+
+Package: crayon
+Source: CRAN
+Version: 1.3.4
+Hash: ff2840dd9b0d563fc80377a5a45510cd
+
+Package: dichromat
+Source: CRAN
+Version: 2.0-0
+Hash: 08eed0c80510af29bb15f840ccfe37ce
+
+Package: digest
+Source: CRAN
+Version: 0.6.15
+Hash: 1f202ebd812ac7192be3739245746a13
+
+Package: fansi
+Source: CRAN
+Version: 0.2.3
+Hash: ea2d591618224c56c8d5befde9af822b
+
+Package: ggplot2
+Source: CRAN
+Version: 3.0.0
+Hash: 8332448b76ff31472a1bf6dd31fcddb1
+Requires: digest, gtable, lazyeval, plyr, reshape2, rlang, scales,
+    tibble, viridisLite, withr
+
+Package: glue
+Source: CRAN
+Version: 1.3.0
+Hash: 1fbde6dec830370be696eee8ef31c9e4
+
+Package: gtable
+Source: CRAN
+Version: 0.2.0
+Hash: cd78381a9d3fea966ac39bd0daaf5554
+
+Package: htmltools
+Source: CRAN
+Version: 0.3.6
+Hash: 358f767a496785afb8426c3abc8b6471
+Requires: Rcpp, digest
+
+Package: httpuv
+Source: CRAN
+Version: 1.3.6.2
+Hash: 33cd81f808942842d3564b8ae6488f60
+Requires: Rcpp
+
+Package: jsonlite
+Source: CRAN
+Version: 1.5
+Hash: 9c51936d8dd00b2f1d4fe9d10499694c
+
+Package: labeling
+Source: CRAN
+Version: 0.3
+Hash: ecf589b42cd284b03a4beb9665482d3e
+
+Package: lazyeval
+Source: CRAN
+Version: 0.2.1
+Hash: 88926ad9c43581fd0822a37c8ed09f05
+
+Package: magrittr
+Source: CRAN
+Version: 1.5
+Hash: bdc4d48c3135e8f3b399536ddf160df4
+
+Package: mime
+Source: CRAN
+Version: 0.5
+Hash: 463550cf44fb6f0a2359368f42eebe62
+
+Package: munsell
+Source: CRAN
+Version: 0.5.0
+Hash: 247d1c1d72f3072563912ef860758624
+Requires: colorspace
+
+Package: packrat
+Source: CRAN
+Version: 0.4.9-1
+Hash: e95f4c0ccf3ac830a0a480888c1c965f
+
+Package: pillar
+Source: CRAN
+Version: 1.3.0
+Hash: 3e43f774fa6dfba877caca1aebbeaa6a
+Requires: cli, crayon, fansi, rlang, utf8
+
+Package: plyr
+Source: CRAN
+Version: 1.8.4
+Hash: 2d09eea8a6bcac8e61b6a8728917b877
+Requires: Rcpp
+
+Package: reshape2
+Source: CRAN
+Version: 1.4.3
+Hash: db7226b8ea11d02510f74d6a397959d6
+Requires: Rcpp, plyr, stringr
+
+Package: rlang
+Source: CRAN
+Version: 0.2.1
+Hash: 2b163b981be3d6daaac1ad505dd0bf30
+
+Package: scales
+Source: CRAN
+Version: 0.5.0
+Hash: de72bbfa723acfaa28bb99788a303987
+Requires: R6, RColorBrewer, Rcpp, dichromat, labeling, munsell, plyr,
+    viridisLite
+
+Package: shiny
+Source: CRAN
+Version: 1.0.5
+Hash: 4d47532a807122bfd6bc3818310f9d2e
+Requires: R6, digest, htmltools, httpuv, jsonlite, mime, sourcetools,
+    xtable
+
+Package: shinyWidgets
+Source: CRAN
+Version: 0.4.3
+Hash: a5161a9baf5da9dbf041df853d79f49d
+Requires: htmltools, jsonlite, shiny
+
+Package: shinythemes
+Source: CRAN
+Version: 1.1.1
+Hash: d15f59eaa7a9a0668cea3af7f477820c
+Requires: shiny
+
+Package: sourcetools
+Source: CRAN
+Version: 0.1.6
+Hash: 226d56d7469587da40b0f96180e711b4
+
+Package: stringi
+Source: CRAN
+Version: 1.2.4
+Hash: 03ab60ef7fa4627b38ad67c95ce6b04c
+
+Package: stringr
+Source: CRAN
+Version: 1.3.1
+Hash: 9f417a1d899ed1f080942ab36998e8b5
+Requires: glue, magrittr, stringi
+
+Package: tibble
+Source: CRAN
+Version: 1.4.2
+Hash: 83895360ce4f8d2ce92eee00526b5b0b
+Requires: cli, crayon, pillar, rlang
+
+Package: utf8
+Source: CRAN
+Version: 1.1.4
+Hash: f3f97ce59092abc8ed3fd098a59e236c
+
+Package: viridisLite
+Source: CRAN
+Version: 0.3.0
+Hash: 78bb072c4f9e729a283d4c40ec93f9c6
+
+Package: withr
+Source: CRAN
+Version: 2.1.2
+Hash: d534108bcd5f34ec73e9eb523751ba20
+
+Package: xtable
+Source: CRAN
+Version: 1.8-2
+Hash: 7293235cfcc14cdff1ce7fd1a0212031
