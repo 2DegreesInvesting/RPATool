@@ -149,7 +149,8 @@ server <- function(input, output) {
         expected_scenario <- data_frame(years, return = RPA_model(alpha[2]), scenario = rep("Expected", length(years)))
         
         bind_rows(pessimistic_scenario, expected_scenario) %>%
-            ggplot(aes(x = years, y = return, color = scenario)) + geom_line() + theme_linedraw(base_size = 20)
+            ggplot(aes(x = years, y = return, color = scenario)) + geom_area(aes(fill = scenario)) + theme_linedraw(base_size = 20)
+            
     })
     
     
