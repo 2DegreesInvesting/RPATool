@@ -4,6 +4,27 @@ library(shiny)
 library(shinyWidgets)
 library(ggplot2)
 library(shinythemes)
+library(dplyr)
+
+# VARIABLES & PARAMETERS
+
+# years -> Time Horizon
+# monthly -> Monthly Contribution in Euro
+# w -> Initial Amount in Euro
+# risk -> Risk Rategory with values c(0.03, 0.08, 0.14, 0.20, 0.25) but only numbers 1-5 are relevant in this code
+#       1: DEFENSIVE, 2: CAUTIOUS, 3: BALANCED, 4: GROWTH, 5: ADVANCED
+# mu
+# sigma
+# alp -> alpha - conf. interval 0.05, 0.5, 0.95
+
+# Model formula
+# (exp(log(w+(monthly*12*years)) + years*mu + sqrt(years)*sigma*qnorm(alp)))
+
+df <- data_frame(risk = c("def", "cau", "bal", "gro", "adv"),
+                 mu = c(0.0374, 0.0507, 0.0661, 0.0759, 0.0798),
+                 sigma = c(0.0290, 0.0435, 0.0609, 0.0783, 0.0929))
+years <- c(0:25)
+alp <- c(0.05, 0.5, 0.95)
 
 
 ui <- fluidPage(
@@ -46,7 +67,8 @@ ui <- fluidPage(
             br(),
             
             #checkboxGroupButtons("RiskCategory",
-            radioButtons("RiskCategory",
+            div(style = "font-size: 28px;", 
+                radioButtons("RiskCategory",
                          h3("Choose your Risk Category:"),
                          c(
                              "DEFENSIVE  -3% / +11%" = "def",
@@ -55,7 +77,8 @@ ui <- fluidPage(
                              "GROWTH      -20% / +33%" = "gro",
                              "ADVANCED    -25% / +41%" = "adv" 
                          )
-            ) # end of radioButton
+                    )
+            ) # end div of radioButton
             #justified = TRUE, 
             #status = "primary",
             #direction = "vertical",
@@ -78,23 +101,23 @@ ui <- fluidPage(
             wellPanel(#2
                 h2("YOUR PROFILE"),
                 
-                h3("Initial Amout: "),
-                span(h3(textOutput(outputId = "one"), style="color:red")),
+                h2("Initial Amout: "),
+                span(h3(textOutput(outputId = "one"), style="color:mediumblue")),
                 
                 br(),
                 
-                h3("Time Horizon: "),
-                span(h3(textOutput(outputId = "two"), style="color:red")),
+                h2("Time Horizon: "),
+                span(h3(textOutput(outputId = "two"), style="color:mediumblue")),
                 
                 br(),
                 
-                h3("Monthly Contribution:"),
-                span(h3(textOutput(outputId = "three"), style="color:red")),
+                h2("Monthly Contribution:"),
+                span(h3(textOutput(outputId = "three"), style="color:mediumblue")),
                 
                 br(),
                 
-                h3("Risk Category: "),
-                span(h3(textOutput(outputId = "four")))
+                h2("Risk Category: "),
+                span(h3(textOutput(outputId = "four"), style="color:mediumblue"))
                 
                 
                 
@@ -110,7 +133,28 @@ ui <- fluidPage(
 server <- function(input, output) {
     
     output$riskChart <- renderPlot({
-        ggplot()
+        
+        riskParams <- filter(df, risk == input$RiskCategory)
+        muu <- riskParams$mu
+        sigmaa <- riskParams$sigma
+        
+        pessimistic_return <- c(
+            (exp(log(input$InitialAmount + (input$MonthlyContribution*12*years[0:26])) + 
+                     years[0:26]*muu + sqrt(years[0:26])*sigmaa*qnorm(alp[1])))
+            )
+        
+        pessimistic_scenario <- data_frame(years, return = pessimistic_return, scenario = rep("Pessimistic", 26))
+        
+        expected_return <- c(
+            (exp(log(input$InitialAmount + (input$MonthlyContribution*12*years[0:26])) + 
+                     years[0:26]*muu + sqrt(years[0:26])*sigmaa*qnorm(alp[2])))
+        )
+        
+        expected_scenario <- data_frame(years, return = expected_return, scenario = rep("Expected", 26))
+        
+        df_ggplot <- bind_rows(pessimistic_scenario, expected_scenario)
+
+        ggplot(df_ggplot, aes(x = years, y = return, color = scenario)) + geom_line()
     })
     
     
@@ -119,7 +163,7 @@ server <- function(input, output) {
     output$three <- renderText({paste(input$MonthlyContribution, "Euro")})
     output$four <- renderText({
         if (input$RiskCategory == "def") {
-            paste("DEFENSIVE  -3% / +11%")
+            (paste("DEFENSIVE: from -3% to +11%"))
         } else if (input$RiskCategory == "cau") {
             paste("CAUTIOUS    -8% / +17%")
         } else if (input$RiskCategory == "bal") {
@@ -131,8 +175,6 @@ server <- function(input, output) {
         } else {
             paste("Choose a category")
         }
-        
-        
         
     })
 }
