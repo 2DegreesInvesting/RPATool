@@ -24,7 +24,7 @@ df <- data_frame(risk = c("def", "cau", "bal", "gro", "adv"),
                  mu = c(0.0374, 0.0507, 0.0661, 0.0759, 0.0798),
                  sigma = c(0.0290, 0.0435, 0.0609, 0.0783, 0.0929))
 years <- c(0:25)
-alp <- c(0.05, 0.5, 0.95)
+alpha <- c(0.05, 0.5, 0.95)
 
 
 ui <- fluidPage(
@@ -69,15 +69,15 @@ ui <- fluidPage(
             #checkboxGroupButtons("RiskCategory",
             div(style = "font-size: 28px;", 
                 radioButtons("RiskCategory",
-                         h3("Choose your Risk Category:"),
-                         c(
-                             "DEFENSIVE  -3% / +11%" = "def",
-                             "CAUTIOUS    -8% / +17%" = "cau",
-                             "BALANCED    -14% / +25%" = "bal", 
-                             "GROWTH      -20% / +33%" = "gro",
-                             "ADVANCED    -25% / +41%" = "adv" 
-                         )
-                    )
+                             h3("Choose your Risk Category:"),
+                             c(
+                                 "DEFENSIVE  -3% / +11%" = "def",
+                                 "CAUTIOUS    -8% / +17%" = "cau",
+                                 "BALANCED    -14% / +25%" = "bal", 
+                                 "GROWTH      -20% / +33%" = "gro",
+                                 "ADVANCED    -25% / +41%" = "adv" 
+                             )
+                )
             ) # end div of radioButton
             #justified = TRUE, 
             #status = "primary",
@@ -138,23 +138,18 @@ server <- function(input, output) {
         muu <- riskParams$mu
         sigmaa <- riskParams$sigma
         
-        pessimistic_return <- c(
-            (exp(log(input$InitialAmount + (input$MonthlyContribution*12*years[0:26])) + 
-                     years[0:26]*muu + sqrt(years[0:26])*sigmaa*qnorm(alp[1])))
+        RPA_model <- function(alpha) {
+            c(
+                exp(log(input$InitialAmount + (input$MonthlyContribution*12*years)) + 
+                         years*muu + sqrt(years)*sigmaa*qnorm(alpha))
             )
-        
-        pessimistic_scenario <- data_frame(years, return = pessimistic_return, scenario = rep("Pessimistic", 26))
-        
-        expected_return <- c(
-            (exp(log(input$InitialAmount + (input$MonthlyContribution*12*years[0:26])) + 
-                     years[0:26]*muu + sqrt(years[0:26])*sigmaa*qnorm(alp[2])))
-        )
-        
-        expected_scenario <- data_frame(years, return = expected_return, scenario = rep("Expected", 26))
-        
-        df_ggplot <- bind_rows(pessimistic_scenario, expected_scenario)
+        }
 
-        ggplot(df_ggplot, aes(x = years, y = return, color = scenario)) + geom_line()
+        pessimistic_scenario <- data_frame(years, return = RPA_model(alpha[1]), scenario = rep("Pessimistic", length(years)))
+        expected_scenario <- data_frame(years, return = RPA_model(alpha[2]), scenario = rep("Expected", length(years)))
+        
+        bind_rows(pessimistic_scenario, expected_scenario) %>%
+            ggplot(aes(x = years, y = return, color = scenario)) + geom_line()
     })
     
     
