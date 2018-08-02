@@ -138,18 +138,25 @@ server <- function(input, output) {
         muu <- riskParams$mu
         sigmaa <- riskParams$sigma
         
-        RPA_model <- function(alpha) {
+        RPA_model <- function(alpha, muu) {
             c(
                 exp(log(input$InitialAmount + (input$MonthlyContribution*12*years)) + 
                          years*muu + sqrt(years)*sigmaa*qnorm(alpha))
             )
         }
-
-        pessimistic_scenario <- data_frame(years, return = RPA_model(alpha[1]), scenario = rep("Pessimistic", length(years)))
-        expected_scenario <- data_frame(years, return = RPA_model(alpha[2]), scenario = rep("Expected", length(years)))
         
-        bind_rows(pessimistic_scenario, expected_scenario) %>%
-            ggplot(aes(x = years, y = return, color = scenario)) + geom_area(aes(fill = scenario)) + theme_linedraw(base_size = 20)
+        optimistic_scenario <- data_frame(years, return = RPA_model(alpha[3],muu = muu), scenario = rep("Optimistic", length(years)))
+        expected_scenario <- data_frame(years, return = RPA_model(alpha[2], muu = muu), scenario = rep("Expected", length(years)))
+        pessimistic_scenario <- data_frame(years, return = RPA_model(alpha[1], muu = muu), scenario = rep("Pessimistic", length(years)))
+        invested_scenario <- data_frame(years, return = RPA_model(alpha[2],muu = 0), scenario = rep("Invested", length(years)))
+        
+        bind_rows(invested_scenario, pessimistic_scenario, expected_scenario, optimistic_scenario) %>%
+            ggplot(aes(x = years, y = return, fill = factor(scenario, ordered = TRUE, levels = c("Optimistic", "Expected", "Pessimistic", "Invested")))) + 
+            geom_line() +
+            #geom_area(aes(fill = scenario, stat = "identity", alpha = 0.5)) +
+            geom_ribbon(aes(ymin = min(return), ymax = return, fill = factor(scenario, ordered = TRUE, levels = c("Optimistic", "Expected", "Pessimistic", "Invested"))), alpha = 0.9) +
+            scale_fill_manual(name='', values = c("Invested"= "#e6eaef", "Pessimistic"="#c0cad6", "Expected"="#e02a72", "Optimistic"="#70e0a0")) +
+            theme_linedraw(base_size = 20) 
             
     })
     
