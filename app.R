@@ -5,6 +5,8 @@ library(shinyWidgets)
 library(ggplot2)
 library(shinythemes)
 library(dplyr)
+library(grid)
+library(gridExtra)
 
 # VARIABLES & PARAMETERS
 
@@ -27,10 +29,10 @@ years <- c(0:25)
 alpha <- c(0.05, 0.5, 0.95)
 
 
-ui <- fluidPage(
-    themeSelector(),
+ui <- fluidPage(theme = shinytheme("flatly"),
+    #themeSelector(),
     
-    titlePanel("RISK PERFORMANCE TOOL (prototype)"),
+    titlePanel(h1("RISK PERFORMANCE TOOL (prototype)")),
     # SIDEBAR    
     sidebarLayout(
         
@@ -48,7 +50,7 @@ ui <- fluidPage(
             
             sliderInput("TimeHorizon",
                         h3("Time Horizon in years:"),
-                        min = 2,
+                        min = 0,
                         max = 25,
                         step = 1, 
                         value = 5),
@@ -67,7 +69,7 @@ ui <- fluidPage(
             br(),
             
             #checkboxGroupButtons("RiskCategory",
-            div(style = "font-size: 28px;", 
+            div(style = "font-size: 22px;", 
                 radioButtons("RiskCategory",
                              h3("Choose your Risk Category:"),
                              c(
@@ -93,31 +95,31 @@ ui <- fluidPage(
         mainPanel(
             
             wellPanel(#1
-                h2("RISK PROFILE CHART"),
+                h3("RISK PROFILE CHART"),
                 
                 plotOutput("riskChart")
             ), # end of wellPanel 1
             
             wellPanel(#2
-                h2("YOUR PROFILE"),
+                h3("YOUR PROFILE"),
                 
-                h2("Initial Amout: "),
-                span(h3(textOutput(outputId = "one"), style="color:mediumblue")),
-                
-                br(),
-                
-                h2("Time Horizon: "),
-                span(h3(textOutput(outputId = "two"), style="color:mediumblue")),
+                h4("Initial Amout: "),
+                span(h4(textOutput(outputId = "one"), style="color:#3A80C3")),
                 
                 br(),
                 
-                h2("Monthly Contribution:"),
-                span(h3(textOutput(outputId = "three"), style="color:mediumblue")),
+                h4("Time Horizon: "),
+                span(h4(textOutput(outputId = "two"), style="color:#3A80C3")),
                 
                 br(),
                 
-                h2("Risk Category: "),
-                span(h3(textOutput(outputId = "four"), style="color:mediumblue"))
+                h4("Monthly Contribution:"),
+                span(h4(textOutput(outputId = "three"), style="color:#3A80C3")),
+                
+                br(),
+                
+                h4("Risk Category: "),
+                span(h4(textOutput(outputId = "four"), style="color:#3A80C3"))
                 
                 
                 
@@ -131,7 +133,7 @@ ui <- fluidPage(
 
 
 server <- function(input, output) {
-    
+
     output$riskChart <- renderPlot({
         
         riskParams <- filter(df, risk == input$RiskCategory)
@@ -144,20 +146,37 @@ server <- function(input, output) {
                          years*muu + sqrt(years)*sigmaa*qnorm(alpha))
             )
         }
-        
+
         optimistic_scenario <- data_frame(years, return = RPA_model(alpha[3],muu = muu), scenario = rep("Optimistic", length(years)))
         expected_scenario <- data_frame(years, return = RPA_model(alpha[2], muu = muu), scenario = rep("Expected", length(years)))
         pessimistic_scenario <- data_frame(years, return = RPA_model(alpha[1], muu = muu), scenario = rep("Pessimistic", length(years)))
         invested_scenario <- data_frame(years, return = RPA_model(alpha[2],muu = 0), scenario = rep("Invested", length(years)))
+
+        g <- bind_rows(invested_scenario, pessimistic_scenario, expected_scenario, optimistic_scenario)
+
+        #g$returnminsd <- g$return - sd(g$return, na.rm = TRUE)
+        #g$returnmaxsd <- g$return + sd(g$return, na.rm = TRUE)
         
-        bind_rows(invested_scenario, pessimistic_scenario, expected_scenario, optimistic_scenario) %>%
-            ggplot(aes(x = years, y = return, fill = factor(scenario, ordered = TRUE, levels = c("Optimistic", "Expected", "Pessimistic", "Invested")))) + 
-            geom_line() +
-            #geom_area(aes(fill = scenario, stat = "identity", alpha = 0.5)) +
-            geom_ribbon(aes(ymin = min(return), ymax = return, fill = factor(scenario, ordered = TRUE, levels = c("Optimistic", "Expected", "Pessimistic", "Invested"))), alpha = 0.9) +
-            scale_fill_manual(name='', values = c("Invested"= "#e6eaef", "Pessimistic"="#c0cad6", "Expected"="#e02a72", "Optimistic"="#70e0a0")) +
-            theme_linedraw(base_size = 20) 
-            
+        p <- ggplot(g, aes(x = years, 
+                           y = return, 
+                           color = factor(scenario, ordered = TRUE, 
+                                          levels = c("Optimistic", "Expected", "Pessimistic", "Invested")))) + 
+            #geom_ribbon(aes(ymin = min(return), ymax = return, fill = factor(scenario, ordered = TRUE, levels = c("Optimistic", "Expected", "Pessimistic", "Invested"))), alpha = 0.5) +
+            #scale_fill_manual(name='', values = c("Invested"= "#ffffff", "Pessimistic"="#ffffff", "Expected"="#e52b50", "Optimistic"="#70e0a0")) +
+            theme_classic(base_size = 20) + 
+            theme(legend.title = element_blank()) +
+            geom_line(linetype = "solid", size = 2) +
+            scale_color_manual(values = c("#2ae0af", "black", "pink", "grey")) + 
+            geom_vline(xintercept = input$TimeHorizon, color = "black") 
+
+        abc <- (filter(g, years == input$TimeHorizon))
+
+        p2 = p + geom_point(data=abc, aes(x=years, y=return), size = 8) + 
+            geom_label(data=abc, aes(x=years, y=return, label=paste(round(return, digits = 0), "€")), 
+                       nudge_x = 1.5, nudge_y = 0, fontface = "bold", size = 6)
+
+        p2 
+   
     })
     
     
