@@ -62,7 +62,7 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                         h3("Monthly Contribution in Euro:"),
                         min = 0,
                         max = 5000,
-                        value = 100,
+                        value = 0,
                         step = 100),
             br(),
             hr(),
@@ -97,7 +97,12 @@ ui <- fluidPage(theme = shinytheme("flatly"),
             wellPanel(#1
                 h3("RISK PROFILE CHART"),
                 
-                plotOutput("riskChart")
+            navbarPage("",
+                       tabPanel("25 Years",
+                plotOutput("riskChart")),
+                       tabPanel("5 Years",
+                plotOutput("riskChart5"))
+            ) # end of navbarPage
             ), # end of wellPanel 1
             
             wellPanel(#2
@@ -178,6 +183,53 @@ server <- function(input, output) {
         p2 
    
     })
+    
+    output$riskChart5 <- renderPlot({
+        
+        riskParams <- filter(df, risk == input$RiskCategory)
+        muu <- riskParams$mu
+        sigmaa <- riskParams$sigma
+        
+        RPA_model <- function(alpha, muu) {
+            c(
+                exp(log(input$InitialAmount + (input$MonthlyContribution*12*years)) + 
+                        years*muu + sqrt(years)*sigmaa*qnorm(alpha))
+            )
+        }
+        
+        optimistic_scenario <- data_frame(years, return = RPA_model(alpha[3],muu = muu), scenario = rep("Optimistic", length(years)))
+        expected_scenario <- data_frame(years, return = RPA_model(alpha[2], muu = muu), scenario = rep("Expected", length(years)))
+        pessimistic_scenario <- data_frame(years, return = RPA_model(alpha[1], muu = muu), scenario = rep("Pessimistic", length(years)))
+        invested_scenario <- data_frame(years, return = RPA_model(alpha[2],muu = 0), scenario = rep("Invested", length(years)))
+        
+        g <- bind_rows(invested_scenario, pessimistic_scenario, expected_scenario, optimistic_scenario)
+        
+        #g$returnminsd <- g$return - sd(g$return, na.rm = TRUE)
+        #g$returnmaxsd <- g$return + sd(g$return, na.rm = TRUE)
+        
+        p <- ggplot(g, aes(x = years, 
+                           y = return, 
+                           color = factor(scenario, ordered = TRUE, 
+                                          levels = c("Optimistic", "Expected", "Pessimistic", "Invested")))) + 
+            #geom_ribbon(aes(ymin = min(return), ymax = return, fill = factor(scenario, ordered = TRUE, levels = c("Optimistic", "Expected", "Pessimistic", "Invested"))), alpha = 0.5) +
+            #scale_fill_manual(name='', values = c("Invested"= "#ffffff", "Pessimistic"="#ffffff", "Expected"="#e52b50", "Optimistic"="#70e0a0")) +
+            theme_classic(base_size = 20) + 
+            theme(legend.title = element_blank()) +
+            geom_line(linetype = "solid", size = 2) +
+            scale_color_manual(values = c("#2ae0af", "black", "pink", "grey")) + 
+            geom_vline(xintercept = input$TimeHorizon, color = "black") 
+        
+        abc <- (filter(g, years == input$TimeHorizon))
+        ymaxim <- max(optimistic_scenario$return)
+        p2 = p + geom_point(data=abc, aes(x=years, y=return), size = 8) + 
+            geom_label(data=abc, aes(x=years, y=return, label=paste(round(return, digits = 0), "€")), 
+                       nudge_x = 0, nudge_y = 0, fontface = "bold", size = 6) +
+            xlim(NA, 5) + ylim(4900, 7000)
+        
+        p2 
+        
+    })
+    
     
     
     output$one <- renderText({paste("Initial Amount is", input$InitialAmount, "Euro")}) 
