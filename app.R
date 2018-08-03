@@ -196,7 +196,8 @@ server <- function(input, output) {
 
         p2 = p + geom_point(data=abc, aes(x=years, y=return), size = 8) + 
             geom_label(data=abc, aes(x=years, y=return, label=paste(round(return, digits = 0), "€")), 
-                       nudge_x = 1.5, nudge_y = 0, fontface = "bold", size = 6)
+                       nudge_x = 1.5, nudge_y = 0, fontface = "bold", size = 6, show_guide=FALSE) +
+            labs(y = "Return in €", x = "Years")
 
         p2 
    
@@ -241,8 +242,9 @@ server <- function(input, output) {
         ymaxim <- max(optimistic_scenario$return)
         p2 = p + geom_point(data=abc, aes(x=years, y=return), size = 8) + 
             geom_label(data=abc, aes(x=years, y=return, label=paste(round(return, digits = 0), "€")), 
-                       nudge_x = 0, nudge_y = 0, fontface = "bold", size = 6) +
-            xlim(NA, 5) + ylim(4900, 7000)
+                       nudge_x = 0, nudge_y = 0, fontface = "bold", size = 6, show_guide=FALSE) +
+            xlim(NA, 5) + ylim(4900, 7000) + labs(y = "Return in €", x = "Years") #+ 
+           # theme(legend.key=element_rect(color=c("#6fb3e8", "#2175c4", "#e2768b", "#a8bdd1"), fill=c("#6fb3e8", "#2175c4", "#e2768b", "#a8bdd1")))
         
         p2 
         
