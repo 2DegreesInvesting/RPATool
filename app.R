@@ -44,50 +44,60 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                          max = 100000,
                          value = 5000,
                          step = 100),
-            br(),
             hr(),
-            br(),
-            
+
             sliderInput("TimeHorizon",
-                        h3("Time Horizon in years:"),
+                        h3("Time Horizon* in years:"),
                         min = 0,
                         max = 25,
                         step = 1, 
                         value = 5),
-            br(),
+            "*Choose during how many years you would like to invest",
             hr(),
-            br(),
-            
+
             sliderInput("MonthlyContribution",
                         h3("Monthly Contribution in Euro:"),
                         min = 0,
                         max = 5000,
                         value = 0,
                         step = 100),
-            br(),
             hr(),
-            br(),
-            
+
             #checkboxGroupButtons("RiskCategory",
             div(style = "font-size: 22px;", 
                 radioButtons("RiskCategory",
                              h3("Choose your Risk Category:"),
                              c(
-                                 "DEFENSIVE  -3% / +11%" = "def",
-                                 "CAUTIOUS    -8% / +17%" = "cau",
-                                 "BALANCED    -14% / +25%" = "bal", 
-                                 "GROWTH      -20% / +33%" = "gro",
-                                 "ADVANCED    -25% / +41%" = "adv" 
+                                 "DEFENSIVE" = "def",
+                                 "CAUTIOUS" = "cau",
+                                 "BALANCED" = "bal", 
+                                 "GROWTH" = "gro",
+                                 "ADVANCED" = "adv" 
                              )
                 )
-            ) # end div of radioButton
-            #justified = TRUE, 
-            #status = "primary",
-            #direction = "vertical",
-            #individual = FALSE,
-            #checkIcon = list(yes = icon("ok", lib = "glyphicon"), no = icon("remove", lib = "glyphicon"))
-            #)
-            
+            ),  # end div of radioButton
+            wellPanel(#2
+                h3("YOUR PROFILE"),
+                
+                h4(#"Initial Amout: "
+                   ),
+                span(h3(textOutput(outputId = "one"), style="color:#3A80C3")),
+                
+
+                h4(#"Time Horizon: "
+                   ),
+                span(h3(textOutput(outputId = "two"), style="color:#3A80C3")),
+                
+
+                h4(#"Monthly Contribution:"
+                   ),
+                span(h3(textOutput(outputId = "three"), style="color:#3A80C3")),
+                
+
+                h4(#"Risk Category: "
+                   ),
+                span(h3(textOutput(outputId = "four"), style="color:#3A80C3")) 
+            )
             
         ), ## ens of sidebarPanel
         
@@ -95,40 +105,17 @@ ui <- fluidPage(theme = shinytheme("flatly"),
         mainPanel(
             
             wellPanel(#1
-                h3("RISK PROFILE CHART"),
+                h3("PERFORMANCE CHART"),
                 
             navbarPage("",
-                       tabPanel("25 Years",
+                       tabPanel("Long Term (25 Years)",
                 plotOutput("riskChart")),
-                       tabPanel("5 Years",
+                       tabPanel("Short Term (5 Years)",
                 plotOutput("riskChart5"))
             ) # end of navbarPage
-            ), # end of wellPanel 1
+            ) # end of wellPanel 1
             
-            wellPanel(#2
-                h3("YOUR PROFILE"),
-                
-                h4("Initial Amout: "),
-                span(h4(textOutput(outputId = "one"), style="color:#3A80C3")),
-                
-                br(),
-                
-                h4("Time Horizon: "),
-                span(h4(textOutput(outputId = "two"), style="color:#3A80C3")),
-                
-                br(),
-                
-                h4("Monthly Contribution:"),
-                span(h4(textOutput(outputId = "three"), style="color:#3A80C3")),
-                
-                br(),
-                
-                h4("Risk Category: "),
-                span(h4(textOutput(outputId = "four"), style="color:#3A80C3"))
-                
-                
-                
-            ) # end of wellPanel 2
+           
             
             ### MAIN PANEL: "Your Profile""
             
@@ -171,7 +158,7 @@ server <- function(input, output) {
             theme_classic(base_size = 20) + 
             theme(legend.title = element_blank()) +
             geom_line(linetype = "solid", size = 2) +
-            scale_color_manual(values = c("#2ae0af", "black", "pink", "grey")) + 
+            scale_color_manual(values = c("#6fb3e8", "#2175c4", "#e2768b", "#a8bdd1")) + 
             geom_vline(xintercept = input$TimeHorizon, color = "black") 
 
         abc <- (filter(g, years == input$TimeHorizon))
@@ -216,7 +203,7 @@ server <- function(input, output) {
             theme_classic(base_size = 20) + 
             theme(legend.title = element_blank()) +
             geom_line(linetype = "solid", size = 2) +
-            scale_color_manual(values = c("#2ae0af", "black", "pink", "grey")) + 
+            scale_color_manual(values = c("#6fb3e8", "#2175c4", "#e2768b", "#a8bdd1")) + 
             geom_vline(xintercept = input$TimeHorizon, color = "black") 
         
         abc <- (filter(g, years == input$TimeHorizon))
@@ -232,20 +219,20 @@ server <- function(input, output) {
     
     
     
-    output$one <- renderText({paste("Initial Amount is", input$InitialAmount, "Euro")}) 
-    output$two <- renderText({paste(input$TimeHorizon, "years")})
-    output$three <- renderText({paste(input$MonthlyContribution, "Euro")})
+    output$one <- renderText({paste("Initial Amount is:", input$InitialAmount, "Euro")}) 
+    output$two <- renderText({paste("Time Horizon is:", input$TimeHorizon, "years")})
+    output$three <- renderText({paste("Monthly Contribution is:", input$MonthlyContribution, "Euro")})
     output$four <- renderText({
         if (input$RiskCategory == "def") {
-            (paste("DEFENSIVE: from -3% to +11%"))
+            (paste("Risk Cathegory is: DEFENSIVE"))
         } else if (input$RiskCategory == "cau") {
-            paste("CAUTIOUS    -8% / +17%")
+            paste("Risk Cathegory is: CAUTIOUS")
         } else if (input$RiskCategory == "bal") {
-            paste("BALANCED    -14% / +25%")
+            paste("Risk Cathegory is: BALANCED")
         } else if (input$RiskCategory == "gro") {
-            paste("GROWTH      -20% / +33%")
+            paste("Risk Cathegory is: GROWTH")
         } else if (input$RiskCategory == "adv") {
-            paste ("ADVANCED    -25% / +41%")
+            paste ("Risk Cathegory is: ADVANCED")
         } else {
             paste("Choose a category")
         }
