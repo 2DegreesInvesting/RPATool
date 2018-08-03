@@ -32,7 +32,8 @@ alpha <- c(0.05, 0.5, 0.95)
 ui <- fluidPage(theme = shinytheme("flatly"),
     #themeSelector(),
     
-    titlePanel(h1("RISK PERFORMANCE TOOL (prototype)")),
+    titlePanel(h1("RISK PERFORMANCE TOOL (prototype)", align = "center", style = "font-size:42px;"),
+    windowTitle = "RPA-Tool"),
     # SIDEBAR    
     sidebarLayout(
         
@@ -68,15 +69,19 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                 radioButtons("RiskCategory",
                              h3("Choose your Risk Category:"),
                              c(
-                                 "DEFENSIVE" = "def",
-                                 "CAUTIOUS" = "cau",
-                                 "BALANCED" = "bal", 
-                                 "GROWTH" = "gro",
-                                 "ADVANCED" = "adv" 
+                                 "CAUTIOUS" = "def",
+                                 "TENTATIVE" = "cau",
+                                 "CONFIDENT" = "bal", 
+                                 "AMBITIOUS" = "gro",
+                                 "ADVENTUROUS" = "adv" 
                              )
                 )
             ),  # end div of radioButton
+            hr(),
+            br(),
+            
             wellPanel(#2
+                style = "background-color: #ffffff;", style = "border-color: #ffffff;",
                 h3("YOUR PROFILE"),
                 
                 h4(#"Initial Amout: "
@@ -112,10 +117,36 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                 plotOutput("riskChart")),
                        tabPanel("Short Term (5 Years)",
                 plotOutput("riskChart5"))
-            ) # end of navbarPage
-            ) # end of wellPanel 1
+            ), # end of navbarPage
+            br(),
+            h3(img(src = "chart_icon.png", #height = 480, width = 320, 
+                                     width = "3%"), "Understanding the Performance Chart"), 
+            h4("The above chart represents the expected returns 
+            you may have after a specific amount of investment 
+            years (so called Time-Horizon)."),
+            br(),
+            h4("4 Lines are represented:",
+               br(strong("•	Invested:"), "is the total amount you have invested during the time frame of your investment"),
+               strong("•	Expected:"), "is the most likely expected outcome / return of your investment on a given date",
+               br(strong("•	Optimistic:"), " is the maximum outcome you could be expecting from your investment"),
+               strong("•	Pessimistic:"), "is the minimum or lowest outcome you could be expecting from your investment (with a 95% probability)" 
+            )
             
-           
+            
+            ), # end of wellPanel 1
+           wellPanel(
+             wellPanel(
+                h3(img(src = "info_icon.png", #height = 480, width = 320, 
+                       width = "3%"), "How to choose your Risk Category?"),
+                h4("With investing, there’s always a chance that investments 
+                   can go down in value. By defining your risk category or 
+                   risk/reward balance, you define the maximum loss you could 
+                   accept for the maximum reward possible.")),
+              wellPanel(align = "center",
+                img(src = "RPATable.png", width = "70%")
+                
+            )
+           )
             
             ### MAIN PANEL: "Your Profile""
             
@@ -224,15 +255,15 @@ server <- function(input, output) {
     output$three <- renderText({paste("Monthly Contribution is:", input$MonthlyContribution, "Euro")})
     output$four <- renderText({
         if (input$RiskCategory == "def") {
-            (paste("Risk Cathegory is: DEFENSIVE"))
+            (paste("Risk Cathegory is: CAUTIOUS"))
         } else if (input$RiskCategory == "cau") {
-            paste("Risk Cathegory is: CAUTIOUS")
+            paste("Risk Cathegory is: TENTATIVE")
         } else if (input$RiskCategory == "bal") {
-            paste("Risk Cathegory is: BALANCED")
+            paste("Risk Cathegory is: CONFIDENT")
         } else if (input$RiskCategory == "gro") {
-            paste("Risk Cathegory is: GROWTH")
+            paste("Risk Cathegory is: AMBITIOUS")
         } else if (input$RiskCategory == "adv") {
-            paste ("Risk Cathegory is: ADVANCED")
+            paste ("Risk Cathegory is: ADVENTUROUS")
         } else {
             paste("Choose a category")
         }
