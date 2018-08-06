@@ -242,6 +242,12 @@ Source: CRAN
 Version: 0.7
 Hash: 20757f5c393ed0ecf96c9e8e6d8d514c
 
+Package: hms
+Source: CRAN
+Version: 0.4.2
+Hash: b4096a4f6a6736138e9a825c2baaacf0
+Requires: pkgconfig, rlang
+
 Package: htmltools
 Source: CRAN
 Version: 0.3.6
@@ -347,6 +353,12 @@ Version: 0.8.1
 Hash: 1d3a60eb2dde3a19ad1cfb0fe32c5b7f
 Requires: assertive, digest, dplyr, httr, jsonlite, magrittr, purrr
 
+Package: readr
+Source: CRAN
+Version: 1.1.1
+Hash: 70f2df9a128697b88134875a72dfd322
+Requires: BH, R6, Rcpp, hms, tibble
+
 Package: reshape2
 Source: CRAN
 Version: 1.4.3
@@ -416,6 +428,13 @@ Source: CRAN
 Version: 1.4.2
 Hash: 83895360ce4f8d2ce92eee00526b5b0b
 Requires: cli, crayon, pillar, rlang
+
+Package: tidyr
+Source: CRAN
+Version: 0.8.1
+Hash: 266d0da5ea2c9fbbc10cdddff7c39b6d
+Requires: Rcpp, dplyr, glue, magrittr, purrr, rlang, stringi, tibble,
+    tidyselect
 
 Package: tidyselect
 Source: CRAN
