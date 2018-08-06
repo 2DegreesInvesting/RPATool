@@ -1,0 +1,12 @@
+name: RPATool
+title: RPATool
+username:
+account: 2degrees-investing
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 394540
+bundleId: 1517207
+url: https://2degrees-investing.shinyapps.io/RPATool/
+when: 1533318810.03172
+asMultiple: FALSE
+asStatic: FALSE

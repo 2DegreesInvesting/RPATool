@@ -77,6 +77,10 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                              )
                 )
             ),  # end div of radioButton
+            
+            hr(),
+            br(),
+            actionButton("go", "Show Plot"),
             hr(),
             br(),
             
@@ -157,7 +161,21 @@ ui <- fluidPage(theme = shinytheme("flatly"),
 
 server <- function(input, output) {
 
+    v <- reactiveValues(doPlot = FALSE)
+    
+    observeEvent(input$go, {
+        # 0 will be coerced to FALSE
+        # 1+ will be coerced to TRUE
+        v$doPlot <- input$go
+    })
+    
+    
+ 
     output$riskChart <- renderPlot({
+        
+        if (v$doPlot == FALSE) return() 
+        
+        isolate({
         
         riskParams <- filter(df, risk == input$RiskCategory)
         muu <- riskParams$mu
@@ -194,13 +212,14 @@ server <- function(input, output) {
 
         abc <- (filter(g, years == input$TimeHorizon))
 
-        p2 = p + geom_point(data=abc, aes(x=years, y=return), size = 8) + 
+        p2 <- p + geom_point(data=abc, aes(x=years, y=return), size = 8) + 
             geom_label(data=abc, aes(x=years, y=return, label=paste(round(return, digits = 0), "€")), 
-                       nudge_x = 1.5, nudge_y = 0, fontface = "bold", size = 6, show_guide=FALSE) +
+                       nudge_x = 1.5, nudge_y = 0, fontface = "bold", size = 6, show.legend=FALSE) +
             labs(y = "Return in €", x = "Years")
 
         p2 
    
+    })
     })
     
     output$riskChart5 <- renderPlot({
