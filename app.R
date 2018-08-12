@@ -65,7 +65,7 @@ alpha <- c(0.05, 0.5, 0.95)
 ui <- fluidPage(theme = shinytheme("flatly"),
     #themeSelector(),
     
-    titlePanel(h1("RISK PERFORMANCE TOOL (prototype)", align = "center", style = "font-size:42px;"),
+    titlePanel(h3("RISK PERFORMANCE TOOL", align = "center", style = "font-size:42px;"),
     windowTitle = "RPA-Tool"),
    
      # SIDEBAR    
@@ -74,30 +74,30 @@ ui <- fluidPage(theme = shinytheme("flatly"),
         ## SIDEBAR input parameters #
         sidebarPanel(
             numericInput("InitialAmount",
-                         h3("Initial Amount in Euro:"),
+                         h4("Initial Amount in Euro:"),
                          min = 5000,
                          max = 100000,
                          value = 5000,
                          step = 100),
-            hr(),
+           # hr(),
             sliderInput("TimeHorizon",
-                        h3("Time Horizon* in years:"),
+                        h4("Time Horizon* in years:"),
                         min = 0,
                         max = 25,
                         step = 1, 
                         value = 5),
             "*Choose during how many years you would like to invest",
-            hr(),
+            #hr(),
             sliderInput("MonthlyContribution",
-                        h3("Monthly Contribution in Euro:"),
+                        h4("Monthly Contribution in Euro:"),
                         min = 0,
                         max = 5000,
                         value = 0,
                         step = 100),
-            hr(),
-            div(style = "font-size: 22px;", 
+            #hr(),
+            div(style = "font-size: 16px;", 
                 radioButtons("RiskCategory",
-                             h3("Choose your Risk Category:"),
+                             h4("Choose your Risk Category:"),
                              c(
                                  "CAUTIOUS" = "cautious",
                                  "TENTATIVE" = "tentative",
@@ -107,30 +107,33 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                              )
                 )
             ),  # end div of radioButton
+            #hr(),
+            tags$head(
+                tags$style(HTML("#go{background-color:#00D39B; font-size: 18px}"))
+            ),
+            div(style = "font-size: 42px;",
+            actionButton("go", "Show Plot")),
             hr(),
-            br(),
-            actionButton("go", "Show Plot"),
-            hr(),
-            br(),
+            #br(),
             wellPanel(#Your Profile
                 style = "background-color: #ffffff;", style = "border-color: #ffffff;",
-                h3("YOUR PROFILE"),
+                h4("YOUR PROFILE"),
                 
-                h4(#"Initial Amout: "
+                h5(#"Initial Amout: "
                    ),
-                    span(h3(textOutput(outputId = "one"), style="color:#3A80C3")),
+                    span(h5(textOutput(outputId = "one"), style="color:#3A80C3")),
 
-                h4(#"Time Horizon: "
+                h5(#"Time Horizon: "
                    ),
-                    span(h3(textOutput(outputId = "two"), style="color:#3A80C3")),
+                    span(h5(textOutput(outputId = "two"), style="color:#3A80C3")),
 
-                h4(#"Monthly Contribution:"
+                h5(#"Monthly Contribution:"
                    ),
-                    span(h3(textOutput(outputId = "three"), style="color:#3A80C3")),
+                    span(h5(textOutput(outputId = "three"), style="color:#3A80C3")),
 
-                h4(#"Risk Category: "
+                h5(#"Risk Category: "
                    ),
-                    span(h3(textOutput(outputId = "four"), style="color:#3A80C3")) 
+                    span(h5(textOutput(outputId = "four"), style="color:#3A80C3")) 
             ) #end of wellPanel Your Profile
             
         ), ## end of sidebarPanel
@@ -143,21 +146,24 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                 
             navbarPage("",
                        tabPanel("Long Term (25 Years)",
-                plotOutput("riskChart")),
+                div(plotOutput(outputId = "riskChart", width = "100%", height = "500px")),
+                style = "padding-right: 5%; padding-left: 5%"),
                 
                        tabPanel("Short Term (5 Years)",
-                plotOutput("riskChartFive"))
+                div(plotOutput(outputId = "riskChartFive", width = "100%", height = "500px")),
+                    style = "padding-right: 5%; padding-left: 5%; width: 100%; height: 500%"
+                )
                 
             ), # end of navbarPage
             br(),
             
-            h3(img(src = "chart_icon.png", #height = 480, width = 320, 
+            h4(img(src = "chart_icon.png", #height = 480, width = 320, 
                                      width = "3%"), "Understanding the Performance Chart"), 
-            h4("The above chart represents the expected returns 
+            h5("The above chart represents the expected returns 
             you may have after a specific amount of investment 
             years (so called Time-Horizon)."),
             br(),
-            h4("4 Lines are represented:",
+            h5("4 Lines are represented:",
                br(strong("•	Invested:"), "is the total amount you have invested during the time frame of your investment"),
                strong("•	Expected:"), "is the most likely expected outcome / return of your investment on a given date",
                br(strong("•	Optimistic:"), " is the maximum outcome you could be expecting from your investment"),
@@ -167,9 +173,9 @@ ui <- fluidPage(theme = shinytheme("flatly"),
             
            wellPanel(#2
              wellPanel(
-                h3(img(src = "info_icon.png", #height = 480, width = 320, 
+                h4(img(src = "info_icon.png", #height = 480, width = 320, 
                        width = "3%"), "How to choose your Risk Category?"),
-                h4("With investing, there’s always a chance that investments 
+                h5("With investing, there’s always a chance that investments 
                    can go down in value. By defining your risk category or 
                    risk/reward balance, you define the maximum loss you could 
                    accept for the maximum reward possible.")),
@@ -232,13 +238,13 @@ server <- function(input, output) {
             geom_line(linetype = "solid", size = 2) +
             scale_y_continuous(labels = comma) +
             scale_color_manual(values = c("#6fb3e8", "#2175c4", "#e2768b", "#a8bdd1")) + 
-            geom_vline(xintercept = input$TimeHorizon, color = "black") 
+            geom_vline(xintercept = input$TimeHorizon, color = "black", linetype="dotted") 
 
         abc <- (filter(g, years == input$TimeHorizon))
 
         p2 <- p + geom_point(data=abc, aes(x=years, y=return), size = 8) + 
             geom_label(data=abc, aes(x=years, y=return, label=paste(round(return, digits = 0), "€")), 
-                       nudge_x = 1.5, nudge_y = 0, fontface = "bold", size = 6, show.legend=FALSE) +
+                       nudge_x = 2, nudge_y = 1, fontface = "bold", size = 6, show.legend=FALSE) +
             labs(y = "Return in €", x = "Years") 
         
 
@@ -293,19 +299,14 @@ server <- function(input, output) {
             geom_line(linetype = "solid", size = 2) +
             scale_y_continuous(labels = comma) +
             scale_color_manual(values = c("#6fb3e8", "#2175c4", "#e2768b", "#a8bdd1")) + 
-            geom_vline(xintercept = input$TimeHorizon, color = "black") 
+            geom_vline(xintercept = input$TimeHorizon, color = "black", linetype="dotted") 
         
         abc <- (filter(g5, years == input$TimeHorizon))
-        ymaxim <- optimistic_scenario %>% filter(years == 5)
         
-        # p2 <- p + geom_point(data=abc, aes(x=years, y=return), size = 8) + 
-        #     geom_label(data=abc, aes(x=years, y=return, label=paste(round(return, digits = 0), "€")), 
-        #                nudge_x = 1.5, nudge_y = 0, fontface = "bold", size = 6, show.legend=FALSE) +
-        #     labs(y = "Return in €", x = "Years") 
         
         p52 = p5 + geom_point(data=abc, aes(x=years, y=return), size = 8) + 
             geom_label(data=abc, aes(x=years, y=return, label=paste(round(return, digits = 0), "€")), 
-                       nudge_x = 0, nudge_y = 0, fontface = "bold", size = 6, show.legend = FALSE) +
+                       nudge_x = 0.35, nudge_y = 1, fontface = "bold", size = 6, show.legend = FALSE) +
             #xlim(NA, 5) + ylim(NA, ymaxim$return) + 
             labs(y = "Return in €", x = "Years")
             
